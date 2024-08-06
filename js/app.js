@@ -19,10 +19,10 @@ cardapio.metodos = {
      obterItensCardapio: (categoria = 'burgers', vermais = false) => {
        
         var filtro = MENU[categoria];
-        console.log('asdasdasdas', filtro);
+        console.log(filtro);
 
         if (!vermais) {
-            $("#ItensCardapio").html('');
+            $("#itensCardapio").html('');
             $("#btnVerMais").removeClass('hidden');
         }
 
@@ -30,17 +30,17 @@ cardapio.metodos = {
 
             let temp = cardapio.templates.item.replace(/\${img}/g, e.img)
             .replace(/\${nome}/g, e.name)
-            .replace(/\${preco}/g, e.price.toFixed(2).replace('.',','))
+            .replace(/\${preco}/g, e.price.toFixed(2).replace('.', ','))
             .replace(/\${id}/g, e.id)
 
             //botão ver mais foi clicado (12 itens)
             if (vermais && i >= 8 && i < 12) {
-                $("#ItensCardapio").append(temp)
+                $("#itensCardapio").append(temp)
             }
 
             // paginação inicial (8 Itens)
             if (!vermais && i < 8) {
-                $("#ItensCardapio").append(temp)
+                $("#itensCardapio").append(temp)
             }
 
         })
@@ -129,7 +129,7 @@ cardapio.metodos = {
 
         var total = 0;
 
-        $.each(MEU_CARRINHO, (i,e) => {
+        $.each(MEU_CARRINHO, (i, e) => {
             total += e.qntd
         })
         
@@ -232,7 +232,7 @@ cardapio.metodos = {
 
                     let temp = cardapio.templates.itemCarrinho.replace(/\${img}/g, e.img)
                     .replace(/\${nome}/g, e.name)
-                    .replace(/\${preco}/g, e.price.toFixed(2).replace('.',','))
+                    .replace(/\${preco}/g, e.price.toFixed(2).replace('.', ','))
                     .replace(/\${id}/g, e.id)
                     .replace(/\${qntd}/g, e.qntd)
 
@@ -242,21 +242,47 @@ cardapio.metodos = {
             
             }
             else {
+                $("#itensCarrinho").html('<p class="carrinho-vazio"><i class="fa fa-shopping-bag"></i> Seu carrinho está vazio.</p>');
+            }
+        },
+        
+        // Diminuir quantidade do item do carrinho
+        diminuirQuantidadeCarrinho: (id) => {
 
+            let qntdAtual = parseInt($("#qntd-carrinho-" + id).text());
+
+            if (qntdAtual > 1) {
+                $("#qntd-carrinho-" + id).text(qntdAtual - 1);
+                cardapio.metodos.atualizarCarrinho(id, qntdAtual - 1);
+            }
+            else {
+                cardapio.metodos.removerItemCarrinho(id)
             }
         },
 
-        diminuirQuantidadeCarrinho: (id) => {
-
-        },
-
+        // aumentar quantidade do item do carrinho
         aumentarQuantidadeCarrinho: (id) => {
 
+            let qntdAtual = parseInt($("#qntd-carrinho-" + id).text());
+            $("#qntd-carrinho-" + id).text(qntdAtual + 1);
+            cardapio.metodos.atualizarCarrinho(id, qntdAtual + 1);
         },
 
         removerItemCarrinho: (id) => {
 
         },
+
+    // atualiza o carrinho com a quantidade atual    
+        atualizarCarrinho: (id, qntd) => {
+            
+            let objIndex = MEU_CARRINHO.findIndex((obj => obj.id ==id));
+            MEU_CARRINHO[objIndex].qntd = qntd;
+
+            // Atualiza o botao carrinho com a quantidade atualizada
+            cardapio.metodos.atualizarBadgeTotal();
+
+        },
+
 
     // mensagens
     mensagem: (texto, cor = 'red', tempo = 3500) => {
@@ -317,6 +343,5 @@ cardapio.templates = {
                          <span class="btn btn-remove" onclick="cardapio.metodos.removerItemCarrinho('\${id}')"><i class="fa fa-times"></i></span>
                     </div>
              </div>                   
-        `
-    
+     `   
 }
